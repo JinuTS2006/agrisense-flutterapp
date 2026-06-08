@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Edit User: {{ user.username }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <div>
+        <label>Username:</label>
+        <input type="text" name="username" value="{{ user.username }}">
+    </div>
+    <div>
+        <label>Email:</label>
+        <input type="text" name="email" value="{{ user.email }}">
+    </div>
+    <div>
+        <label>Role:</label>
+        <select name="role">
+            <option value="admin" {% if user.role == "admin" %}selected{% endif %}>Admin</option>
+            <option value="farmer" {% if user.role == "farmer" %}selected{% endif %}>Farmer</option>
+            <option value="buyer" {% if user.role == "buyer" %}selected{% endif %}>Buyer</option>
+            <option value="delivery" {% if user.role == "delivery" %}selected{% endif %}>Delivery Agent</option>
+        </select>
+    </div>
+    <button type="submit">Update User</button>
+</form>
+
+<a href="{% url 'admin:users' %}">Back to Users</a>
+{% endblock %}

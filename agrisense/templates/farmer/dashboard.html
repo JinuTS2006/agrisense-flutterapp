@@ -1,0 +1,8 @@
+<h2>Farmer Dashboard - {{ city }}</h2>
+
+<p>
+    <a href="{% url 'farmer:recommendation' %}" class="btn btn-primary">Crop Recommendation</a>
+    <a href="{% url 'farmer:yield_prediction' %}" class="btn btn-success">Yield Prediction</a>
+    <a href="{% url 'farmer:profit' %}" class="btn btn-success">Profit Analysis</a>
+    <a href="{% url 'farmer:farmer_profile' %}" class="btn btn-success">Profile</a>
+</p>

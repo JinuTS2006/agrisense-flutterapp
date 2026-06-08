@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Farmer Profile</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <label>Full Name:</label>
+    {{ form.full_name }}
+
+    <label>Phone Number:</label>
+    {{ form.phone_number }}
+
+    <label>Email:</label>
+    {{ form.email }}
+
+    <label>State:</label>
+    {{ form.state }}
+
+    <label>City:</label>
+    {{ form.city }}
+
+    <br><br>
+    <button type="submit">Save Profile</button>
+</form>
+{% endblock %}

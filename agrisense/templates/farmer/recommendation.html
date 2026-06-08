@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Crop Recommendation - {{ farmer_profile.city }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <label>N (Nitrogen):</label>
+    <input type="number" name="N" step="0.1" required><br>
+
+    <label>P (Phosphorus):</label>
+    <input type="number" name="P" step="0.1" required><br>
+
+    <label>K (Potassium):</label>
+    <input type="number" name="K" step="0.1" required><br>
+
+    <label>pH Level:</label>
+    <input type="number" name="ph" step="0.1" required><br><br>
+
+    <button type="submit">Recommend Crops</button>
+</form>
+
+{% if recommended_crops %}
+    <h3>Recommended Crops</h3>
+    <ul>
+        {% for crop in recommended_crops %}
+            <li>
+                <strong>{{ crop.crop }}</strong>
+                — {{ crop.probability }}%
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% endblock %}

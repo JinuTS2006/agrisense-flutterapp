@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Delivery Agent Dashboard</h2>
+
+<div style="display: flex; gap: 20px;">
+    <div style="background: #4caf50; color: white; padding: 15px; border-radius: 8px;">
+        <h3>Total Assignments</h3>
+        <p>{{ total_assignments }}</p>
+    </div>
+    <div style="background: #f39c12; color: white; padding: 15px; border-radius: 8px;">
+        <h3>Pending</h3>
+        <p>{{ pending }}</p>
+    </div>
+    <div style="background: #3498db; color: white; padding: 15px; border-radius: 8px;">
+        <h3>Delivered</h3>
+        <p>{{ delivered }}</p>
+    </div>
+</div>
+
+<a href="{% url 'delivery:view_assignments' %}" style="display:block; margin-top:20px;">View My Assignments</a>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Delivery Agent Profile</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <div>
+        <label>Full Name:</label>
+        <input type="text" name="full_name" value="{{ profile.full_name }}">
+    </div>
+    <div>
+        <label>Phone Number:</label>
+        <input type="text" name="phone_number" value="{{ profile.phone_number }}">
+    </div>
+    <div>
+        <label>City:</label>
+        <input type="text" name="city" value="{{ profile.city }}">
+    </div>
+    <div>
+        <label>State:</label>
+        <input type="text" name="state" value="{{ profile.state }}">
+    </div>
+    <button type="submit">Update Profile</button>
+</form>
+{% endblock %}

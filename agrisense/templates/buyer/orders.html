@@ -1,0 +1,28 @@
+{% extends "buyer/base.html" %}
+
+{% block title %}Order History{% endblock %}
+
+{% block content %}
+<h2>Your Orders</h2>
+
+{% if orders %}
+<table border="1">
+    <tr>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Total Price</th>
+        <th>Order Date</th>
+    </tr>
+    {% for order in orders %}
+    <tr>
+        <td>{{ order.product.name }}</td>
+        <td>{{ order.quantity }}</td>
+        <td>{{ order.total_price }}</td>
+        <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>You have not placed any orders yet.</p>
+{% endif %}
+{% endblock %}

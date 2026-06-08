@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Profit Analysis</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <label>State:</label>
+    <select name="state" required>
+        {% for state in states %}
+        <option value="{{ state }}">{{ state }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Crop:</label>
+    <input type="text" name="crop" required>
+
+    <label>Area (hectares):</label>
+    <input type="number" name="area" step="0.1" required>
+
+    <label>Predicted Yield (tonnes / ha):</label>
+    <input type="number" name="yield" step="0.01" required>
+
+    <button type="submit">Analyze Profit</button>
+</form>
+
+{% if profit_result %}
+<hr>
+<h3>Profit Analysis Result</h3>
+
+<p><strong>Total Yield:</strong>
+   {{ profit_result.total_yield|floatformat:2 }} tonnes
+</p>
+
+<p><strong>Price per tonne:</strong>
+   ₹{{ profit_result.price|floatformat:0 }}
+</p>
+
+<p><strong>Total Revenue:</strong>
+   ₹{{ profit_result.revenue|floatformat:0 }}
+</p>
+
+<p><strong>Total Cost:</strong>
+   ₹{{ profit_result.cost|floatformat:0 }}
+</p>
+
+{% if profit_result.profit > 0 %}
+    <h3 style="color: green;">
+        Net Profit: ₹{{ profit_result.profit|floatformat:0 }}
+    </h3>
+{% else %}
+    <h3 style="color: red;">
+        Net Loss: ₹{{ profit_result.profit|floatformat:0 }}
+    </h3>
+{% endif %}
+{% endif %}
+{% endblock %}

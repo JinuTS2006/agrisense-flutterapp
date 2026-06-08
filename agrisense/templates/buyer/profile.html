@@ -1,0 +1,24 @@
+{% extends "buyer/base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<h2>Your Profile</h2>
+
+<form method="POST" action="{% url 'buyer:buyer_profile' %}">
+    {% csrf_token %}
+    <label>Full Name:</label>
+    <input type="text" name="full_name" value="{{ profile.full_name }}" required><br>
+
+    <label>Phone Number:</label>
+    <input type="text" name="phone_number" value="{{ profile.phone_number }}" required><br>
+
+    <label>City:</label>
+    <input type="text" name="city" value="{{ profile.city }}" required><br>
+
+    <label>State:</label>
+    <input type="text" name="state" value="{{ profile.state }}" required><br><br>
+
+    <button type="submit">Update Profile</button>
+</form>
+{% endblock %}

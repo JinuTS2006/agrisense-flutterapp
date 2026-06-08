@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Welcome, {{ request.user.first_name }}!</h2>
+<p>This is your Farmer Dashboard. Manage your farm activities from here.</p>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px;">
+    <!-- Profile Card -->
+    <div style="flex: 1 1 200px; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align:center;">
+        <h3>Profile</h3>
+        <p>Edit or view your profile</p>
+        <a href="{% url 'farmer:farmer_profile' %}">
+            <button>Go</button>
+        </a>
+    </div>
+
+    <!-- Products Card -->
+    <div style="flex: 1 1 200px; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align:center;">
+        <h3>Products</h3>
+        <p>Add, edit, or delete products</p>
+            <a href="{% url 'farmer:my_products' %}"><button >view</button></a>
+            <a href="{% url 'farmer:add_product' %}"><button >add</button></a>
+        </a>
+    </div>
+
+    <!-- Profit Analysis Card -->
+    <div style="flex: 1 1 200px; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align:center;">
+        <h3>Profit Analysis</h3>
+        <p>Check your expected profits</p>
+        <a href="{% url 'farmer:profit' %}">
+            <button>Go</button>
+        </a>
+    </div>
+
+    <!-- Orders Card -->
+     <div style="flex: 1 1 200px; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align:center;">
+        <h3>Orders</h3>
+        <p>View your orders</p>
+        <a href="{% url 'farmer:farmer_orders' %}">
+            <button>Go</button>
+        </a>
+    </div> 
+
+    <!-- Crop Recommendation Card -->
+    <div style="flex: 1 1 200px; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align:center;">
+        <h3>Crop Recommendation</h3>
+        <p>Get recommended crops for your farm</p>
+        <a href="{% url 'farmer:recommendation' %}">
+            <button>Go</button>
+        </a>
+    </div>
+
+    <!-- Yield Prediction Card -->
+    <div style="flex: 1 1 200px; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align:center;">
+        <h3>Yield Prediction</h3>
+        <p>Predict your crop yield</p>
+        <a href="{% url 'farmer:yield_prediction' %}">
+            <button>Go</button>
+        </a>
+    </div>
+</div>
+{% endblock %}

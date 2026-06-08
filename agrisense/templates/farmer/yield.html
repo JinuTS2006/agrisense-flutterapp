@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" style="max-width:800px; margin:50px auto;">
+
+    <h2>Yield Prediction</h2>
+    <p>Predict your crop yield based on soil nutrients, crop, and weather conditions.</p>
+
+    <form method="post" style="margin-top:30px;">
+        {% csrf_token %}
+
+        <div style="margin-bottom:15px;">
+            <label for="crop">Select Crop:</label>
+            <select name="crop" id="crop" required>
+                <option value="" disabled selected>-- Choose a crop --</option>
+                {% for crop in crop_list %}
+                    <option value="{{ crop }}">{{ crop|capfirst }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label for="N">Nitrogen (N) ppm:</label>
+            <input type="number" step="0.01" name="N" id="N" value="90" required>
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label for="P">Phosphorus (P) ppm:</label>
+            <input type="number" step="0.01" name="P" id="P" value="42" required>
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label for="K">Potassium (K) ppm:</label>
+            <input type="number" step="0.01" name="K" id="K" value="43" required>
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label for="pH">Soil pH:</label>
+            <input type="number" step="0.01" name="pH" id="pH" value="6.5" required>
+        </div>
+
+        <button type="submit" style="padding:10px 20px; background-color:green; color:white; border:none; border-radius:5px;">
+            Predict Yield
+        </button>
+    </form>
+
+    {% if predicted_yield %}
+        <div style="margin-top:30px; padding:20px; border:1px solid #ccc; border-radius:5px; background-color:#f9f9f9;">
+            <h3>Predicted Yield</h3>
+            <p>
+                For <strong>{{ request.POST.crop }}</strong>, the estimated yield is:
+                <strong>{{ predicted_yield }} tonnes/ha</strong>
+            </p>
+        </div>
+    {% endif %}
+
+    {% if messages %}
+        <div style="margin-top:20px;">
+            {% for message in messages %}
+                <p style="color:red;">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

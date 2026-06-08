@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="text-align:center; margin-top:50px;">
+    <h1>Welcome to AgriSense</h1>
+    <p>Your smart agriculture assistant</p>
+
+    <div style="margin-top:40px;">
+        <a href="{% url 'accounts:login' %}" 
+           style="margin:10px; padding:15px 30px; background-color:green; color:white; text-decoration:none; border-radius:5px;">
+            Login
+        </a>
+    </div>
+
+    <h3 style="margin-top:50px;">Register as:</h3>
+    <div style="margin-top:20px;">
+        <a href="{% url 'accounts:register_role' 'farmer' %}" 
+           style="margin:10px; padding:15px 30px; background-color:orange; color:white; text-decoration:none; border-radius:5px;">
+            Farmer
+        </a>
+        <a href="{% url 'accounts:register_role' 'buyer' %}" 
+           style="margin:10px; padding:15px 30px; background-color:blue; color:white; text-decoration:none; border-radius:5px;">
+            Buyer
+        </a>
+        <a href="{% url 'accounts:register_role' 'delivery' %}" 
+           style="margin:10px; padding:15px 30px; background-color:purple; color:white; text-decoration:none; border-radius:5px;">
+            Delivery Agent
+        </a>
+    </div>
+
+    <div style="margin-top:40px;">
+        <p>Choose your role to register and get started!</p>
+    </div>
+</div>
+{% endblock %}

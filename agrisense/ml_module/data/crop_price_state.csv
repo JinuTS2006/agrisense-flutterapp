@@ -1,0 +1,35 @@
+state,crop,avg_price_per_tonne,avg_cost_per_ha
+Karnataka,rice,18000,40000
+Karnataka,maize,19000,35000
+Karnataka,cotton,24000,45000
+Karnataka,coffee,150000,100000
+Karnataka,muskmelon,30000,30000
+Karnataka,banana,50000,45000
+
+Tamil Nadu,rice,18500,41000
+Tamil Nadu,maize,18000,36000
+Tamil Nadu,cotton,23000,44000
+Tamil Nadu,banana,52000,46000
+Tamil Nadu,coffee,148000,97000
+Tamil Nadu,muskmelon,30500,30500
+
+Kerala,rice,20000,42000
+Kerala,banana,54000,47000
+Kerala,maize,19500,37000
+Kerala,cotton,25000,46000
+Kerala,coffee,155000,105000
+Kerala,muskmelon,31000,31000
+
+Andhra Pradesh,rice,17500,38000
+Andhra Pradesh,maize,19500,37000
+Andhra Pradesh,banana,51000,44000
+Andhra Pradesh,cotton,23500,45000
+Andhra Pradesh,coffee,152000,101000
+Andhra Pradesh,muskmelon,29500,29500
+
+Maharashtra,rice,17000,39000
+Maharashtra,maize,18500,36000
+Maharashtra,cotton,25000,46000
+Maharashtra,banana,48000,43000
+Maharashtra,coffee,149000,98000
+Maharashtra,muskmelon,29000,29000

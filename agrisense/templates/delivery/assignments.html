@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>My Assignments</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Assignment ID</th>
+            <th>Order ID</th>
+            <th>Product</th>
+            <th>Buyer</th>
+            <th>Quantity</th>
+            <th>Total Price</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for assignment in assignments %}
+        <tr>
+            <td>{{ assignment.id }}</td>
+            <td>{{ assignment.order.id }}</td>
+            <td>{{ assignment.order.product.name }}</td>
+            <td>{{ assignment.order.buyer.username }}</td>
+            <td>{{ assignment.order.quantity }}</td>
+            <td>{{ assignment.order.total_price }}</td>
+            <td>{{ assignment.get_status_display }}</td>
+            <td>
+                <a href="{% url 'delivery:update_assignment_status' assignment.id %}">Update Status</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8">No assignments yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

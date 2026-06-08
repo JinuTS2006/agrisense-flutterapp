@@ -1,0 +1,35 @@
+{% extends "buyer/base.html" %}
+
+{% block title %}Browse Products{% endblock %}
+
+{% block content %}
+<h2>Available Products</h2>
+
+{% if products %}
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Farmer</th>
+        <th>Price (per unit)</th>
+        <th>Quantity Available</th>
+        <th>Action</th>
+    </tr>
+    {% for product in products %}
+    <tr>
+        <td>{{ product.name }}</td>
+        <td>{{ product.farmer.first_name }}</td>
+        <td>{{ product.price }}</td>
+        <td>{{ product.quantity }}</td>
+        <td>
+            <form method="POST" action="{% url 'buyer:add_to_cart' product.id %}">
+                {% csrf_token %}
+                <button type="submit">Add to Cart</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No products available currently.</p>
+{% endif %}
+{% endblock %}

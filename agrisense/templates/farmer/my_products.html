@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>My Products</h2>
+
+{% if products %}
+    {% for product in products %}
+        
+        <div style="background:#fff;padding:10px;margin-bottom:10px;">
+            <h3>{{ product.name }}</h3>
+            <p>{{ product.description }}</p>
+            <p>Price: ₹{{ product.price }}</p>
+            <p>Quantity: {{ product.quantity }}</p>
+            {% if product.image %}
+                <img src="{{ product.image.url }}" width="150">
+            {% endif %}
+
+            <br>
+            <a href="{% url 'farmer:edit_product' product.id %}">Edit</a> |
+            <a href="{% url 'farmer:delete_product' product.id %}">Delete</a>
+
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No products listed yet.</p>
+{% endif %}
+{% endblock %}

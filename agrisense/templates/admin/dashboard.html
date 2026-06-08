@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Admin Dashboard</h2>
+
+<div style="display:flex; gap:20px; flex-wrap:wrap;">
+    <div style="background:#fff; padding:15px; border-radius:8px; flex:1; min-width:200px;">
+        <h3>Total Users</h3>
+        <p>{{ total_users }}</p>
+    </div>
+    <div style="background:#fff; padding:15px; border-radius:8px; flex:1; min-width:200px;">
+        <h3>Farmers</h3>
+        <p>{{ total_farmers }}</p>
+    </div>
+    <div style="background:#fff; padding:15px; border-radius:8px; flex:1; min-width:200px;">
+        <h3>Buyers</h3>
+        <p>{{ total_buyers }}</p>
+    </div>
+    <div style="background:#fff; padding:15px; border-radius:8px; flex:1; min-width:200px;">
+        <h3>Delivery Agents</h3>
+        <p>{{ total_delivery }}</p>
+    </div>
+    <div style="background:#fff; padding:15px; border-radius:8px; flex:1; min-width:200px;">
+        <h3>Products</h3>
+        <p>{{ total_products }}</p>
+    </div>
+    <div style="background:#fff; padding:15px; border-radius:8px; flex:1; min-width:200px;">
+        <h3>Orders</h3>
+        <p>{{ total_orders }}</p>
+    </div>
+    <div style="background:#fff; padding:15px; border-radius:8px; flex:1; min-width:200px;">
+        <h3>Pending Deliveries</h3>
+        <p>{{ pending_deliveries }}</p>
+    </div>
+</div>
+{% endblock %}

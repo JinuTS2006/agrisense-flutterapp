@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>All Orders</h2>
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Buyer</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Total Price</th>
+            <th>Status</th>
+            <th>Delivery</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.buyer.username }}</td>
+            <td>{{ order.product.name }}</td>
+            <td>{{ order.quantity }}</td>
+            <td>{{ order.total_price }}</td>
+            <td>{{ order.status }}</td>
+            <td>
+                {% if order.delivery_assignment %}
+                    {{ order.delivery_assignment.delivery_agent.username }} ({{ order.delivery_assignment.status }})
+                {% else %}
+                    Not Assigned
+                {% endif %}
+            </td>
+            <td>
+                {% if not order.delivery_assignment %}
+                <a href="{% url 'admin:assign_delivery' order.id %}">Assign Delivery</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8">No orders yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,70 @@
+# Virtual Environment
+venv/
+.env
+.venv/
+env/
+ENV/
+
+# Python Caches & Build
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.pkl
+*.pkl.gz
+*.h5
+*.pb
+*.pt
+*.onnx
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+parts/
+sdist/
+var/
+wheels/
+pip-log.txt
+pip-delete-this-directory.txt
+status.egg-info
+.installed.cfg
+*.egg
+manifest
+spec
+
+# Django specific
+agrisense/db.sqlite3
+agrisense/db.sqlite3-journal
+agrisense/media/
+agrisense/static/collected/
+agrisense/staticfiles/
+agrisense/local_settings.py
+
+# Flutter specific (handled by nested gitignore, but root patterns are helpful)
+agrisense_flutter/.dart_tool/
+agrisense_flutter/.flutter-plugins-dependencies
+agrisense_flutter/.pub-cache/
+agrisense_flutter/.pub/
+agrisense_flutter/build/
+
+# IDE / Editor config
+.idea/
+.vscode/
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.user
+
+# OS generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Assign Delivery for Order #{{ order.id }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <label>Select Delivery Agent:</label>
+    <select name="agent">
+        {% for agent in agents %}
+        <option value="{{ agent.id }}">{{ agent.full_name }} ({{ agent.user.username }})</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Assign</button>
+</form>
+
+<a href="{% url 'admin:orders' %}">Back to Orders</a>
+{% endblock %}
