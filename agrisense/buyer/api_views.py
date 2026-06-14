@@ -61,14 +61,17 @@ class CheckoutInitiateAPIView(views.APIView):
         # Generate OTP
         otp = str(random.randint(100000, 999999))
         
-        # Save session to cache
-        session_key = f"checkout_otp_{request.user.id}"
-        cache.set(session_key, {
-            "otp": otp,
-            "address": address,
-            "phone": phone,
-            "email": email
-        }, timeout=300) # Valid for 5 minutes
+        # Save session to Database CheckoutSession
+        from .models import CheckoutSession
+        CheckoutSession.objects.update_or_create(
+            buyer=request.user,
+            defaults={
+                "otp": otp,
+                "address": address,
+                "phone": phone,
+                "email": email
+            }
+        )
 
         # Send OTP via Email
         from django.core.mail import send_mail
@@ -104,15 +107,22 @@ class CheckoutAPIView(views.APIView):
 
         # Verify OTP
         otp_input = request.data.get("otp")
-        session_key = f"checkout_otp_{request.user.id}"
-        session_data = cache.get(session_key)
+        from .models import CheckoutSession
+        from django.utils import timezone
+        import datetime
 
-        if not session_data or session_data.get("otp") != otp_input:
+        session_data = CheckoutSession.objects.filter(buyer=request.user).first()
+        if not session_data or session_data.otp != otp_input:
             return Response({"error": "Invalid or expired OTP"}, status=status.HTTP_400_BAD_REQUEST)
 
-        address = session_data.get("address")
-        phone = session_data.get("phone")
-        email = session_data.get("email")
+        # Check expiration (5 minutes)
+        if timezone.now() - session_data.created_at > datetime.timedelta(minutes=5):
+            session_data.delete()
+            return Response({"error": "Invalid or expired OTP"}, status=status.HTTP_400_BAD_REQUEST)
+
+        address = session_data.address
+        phone = session_data.phone
+        email = session_data.email
 
         # Save the checkout email to the user so the delivery OTP can reach them
         if email and request.user.email != email:
@@ -169,7 +179,7 @@ class CheckoutAPIView(views.APIView):
             orders.append(buyer_order)
 
         cart_items.delete()
-        cache.delete(session_key)
+        session_data.delete()
 
         return Response({
             "message": f"Order placed successfully and assigned to {agent_profile.full_name}.",

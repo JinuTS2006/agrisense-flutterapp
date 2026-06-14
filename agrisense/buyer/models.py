@@ -28,3 +28,11 @@ class Order(models.Model):
     contact_number = models.CharField(max_length=20, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, default="Pending")  # Pending, Delivered, etc.
+
+class CheckoutSession(models.Model):
+    buyer = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='checkout_session')
+    otp = models.CharField(max_length=6)
+    address = models.TextField()
+    phone = models.CharField(max_length=20)
+    email = models.EmailField()
+    created_at = models.DateTimeField(auto_now=True)
