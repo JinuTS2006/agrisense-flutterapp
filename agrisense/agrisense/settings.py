@@ -56,6 +56,7 @@ AUTH_USER_MODEL = 'accounts.User'
 
 
 MIDDLEWARE = [
+    'accounts.middleware.ErrorLoggingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware', # Added for Render static files
     'django.contrib.sessions.middleware.SessionMiddleware',

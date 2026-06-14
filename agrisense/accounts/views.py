@@ -81,6 +81,22 @@ def diagnose_server(request):
     except Exception as e:
         output.append(f"Showmigrations failed: {e}")
         
+    # 4. Check for error logs
+    try:
+        log_paths = ["django_error_log.txt", "agrisense/django_error_log.txt"]
+        found = False
+        for lp in log_paths:
+            if os.path.exists(lp):
+                with open(lp, "r", encoding="utf-8") as f:
+                    err_content = f.read()
+                output.append(f"Error Log ({lp}):\n{err_content}")
+                found = True
+                break
+        if not found:
+            output.append("No error log file found.")
+    except Exception as e:
+        output.append(f"Error reading error logs: {e}")
+        
     return HttpResponse("\n\n".join(output), content_type="text/plain")
 
 
