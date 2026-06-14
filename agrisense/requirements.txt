@@ -1,5 +1,6 @@
 django>=4.0
 djangorestframework
+djangorestframework-simplejwt
 django-cors-headers
 python-dotenv
 google-generativeai==0.8.6
@@ -7,3 +8,11 @@ dj-database-url
 gunicorn
 whitenoise
 psycopg2-binary
+Pillow
+scikit-learn
+pandas
+numpy
+matplotlib
+joblib
+beautifulsoup4
+groq
