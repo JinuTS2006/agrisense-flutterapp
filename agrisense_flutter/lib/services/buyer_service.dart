@@ -75,22 +75,31 @@ class BuyerService {
   }
 
   static Future<Map<String, dynamic>> checkoutInitiate(String address, String phone, String email) async {
-    final response = await http.post(
-      Uri.parse(ApiConfig.checkoutInitiate),
-      headers: await _getHeaders(),
-      body: jsonEncode({'address': address, 'phone': phone, 'email': email}),
-    );
-    if (response.statusCode == 200) {
-      return {'success': true, 'data': jsonDecode(response.body)};
-    }
-    String errorMsg = 'Failed to initiate checkout';
     try {
-      final decoded = jsonDecode(response.body);
-      if (decoded is Map) {
-        errorMsg = decoded['error'] ?? decoded['detail'] ?? errorMsg;
+      final response = await http.post(
+        Uri.parse(ApiConfig.checkoutInitiate),
+        headers: await _getHeaders(),
+        body: jsonEncode({'address': address, 'phone': phone, 'email': email}),
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': jsonDecode(response.body)};
       }
-    } catch (_) {}
-    return {'success': false, 'error': errorMsg};
+      String errorMsg = 'Failed to initiate checkout';
+      try {
+        final decoded = jsonDecode(response.body);
+        if (decoded is Map) {
+          errorMsg = decoded['error'] ?? decoded['detail'] ?? errorMsg;
+        }
+      } catch (_) {
+        // Response body is likely HTML (500 error page)
+        if (response.statusCode >= 500) {
+          errorMsg = 'Server error (${response.statusCode}). The server may be restarting — please try again in a moment.';
+        }
+      }
+      return {'success': false, 'error': errorMsg};
+    } catch (e) {
+      return {'success': false, 'error': 'Network error: $e'};
+    }
   }
 
 
