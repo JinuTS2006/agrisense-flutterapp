@@ -24,12 +24,13 @@ load_dotenv(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-39diwu(t)mvmbdqsyvp%d0a5buy=b2a&x_3riq$7aa3ar_gpji'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-4l4u&%^e(0_w1!n!p18=6c0s%h#^3=x19w0j*v2_f(y@r3&1')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('RENDER', '') == '' # True if NOT on Render
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*'] # Required for Render
+
 
 
 # Application definition
@@ -56,6 +57,7 @@ AUTH_USER_MODEL = 'accounts.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Added for Render static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -89,15 +91,13 @@ WSGI_APPLICATION = 'agrisense.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'agrisense_db',
-        'USER': 'agrisense_user',
-        'PASSWORD': 'agrisense123',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(
+        default='postgresql://agrisense_user:agrisense123@localhost:5432/agrisense_db',
+        conn_max_age=600
+    )
 }
 
 
@@ -137,6 +137,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
