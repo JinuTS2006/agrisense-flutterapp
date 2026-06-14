@@ -1,15 +1,14 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class ApiConfig {
-  // Automatically switch between localhost for Web/iOS and local IP for physical devices
-  static String get baseUrl {
-    if (kIsWeb) {
-      return 'http://127.0.0.1:8000';
-    } else {
-      // Local IP for physical device testing
-      return 'http://10.30.110.87:8000';
-    }
-  }
+  // Production URL on Render
+  static const String baseUrl = 'https://agrisense-flutterapp.onrender.com';
+
+  // For Android Emulator: Use 10.0.2.2 instead of localhost
+  // static const String baseUrl = 'http://10.0.2.2:8000';
+  
+  // For Physical Device on same network: Use your computer's IP address
+  // static const String baseUrl = 'http://192.168.1.xxx:8000';
 
   // Base API Path
   static String get apiPath => '$baseUrl/api/v1';

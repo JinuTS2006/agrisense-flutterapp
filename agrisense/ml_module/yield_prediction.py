@@ -97,8 +97,13 @@ def predict_yield(crop_name, input_data):
     crop_name: string
     input_data: dict with keys: N,P,K,pH,avg_temp_c,avg_humidity_percent,total_rainfall_mm
     """
-    with open(MODEL_FILE, "rb") as f:
-        model, le = pickle.load(f)
+    try:
+        with open(MODEL_FILE, "rb") as f:
+            model, le = pickle.load(f)
+    except FileNotFoundError:
+        import os
+        dir_contents = os.listdir(os.path.dirname(__file__))
+        raise Exception(f"Model file not found at {MODEL_FILE}. Contents of directory: {dir_contents}")
 
     # Clean and map the crop name
     clean_name = crop_name.lower().strip()
