@@ -1,12 +1,11 @@
 import random
 import traceback
-import datetime
+import json
 
 from rest_framework import views, viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django.core.cache import cache
-from django.utils import timezone
+from django.core import signing
 
 from .models import BuyerProfile, Cart, Order
 from farmer.models import Product
@@ -53,88 +52,7 @@ class CartViewSet(viewsets.ModelViewSet):
 
 
 # ---------------------------------------------------------------------------
-# OTP storage helpers – try CheckoutSession model first, fall back to cache
-# ---------------------------------------------------------------------------
-def _save_checkout_session(user, otp, address, phone, email):
-    """Save checkout session data. DB model first, cache fallback."""
-    try:
-        from .models import CheckoutSession
-        CheckoutSession.objects.update_or_create(
-            buyer=user,
-            defaults={"otp": otp, "address": address, "phone": phone, "email": email},
-        )
-        return "db"
-    except Exception as e:
-        print(f"[CHECKOUT] CheckoutSession DB save failed: {e}")
-        # Fallback: use Django cache
-        cache_key = f"checkout_{user.pk}"
-        cache.set(cache_key, {
-            "otp": otp,
-            "address": address,
-            "phone": phone,
-            "email": email,
-            "created_at": timezone.now().isoformat(),
-        }, timeout=300)  # 5 minutes
-        return "cache"
-
-
-def _load_checkout_session(user):
-    """Load checkout session data. Returns dict or None."""
-    # Try DB first
-    try:
-        from .models import CheckoutSession
-        session = CheckoutSession.objects.filter(buyer=user).first()
-        if session:
-            return {
-                "otp": session.otp,
-                "address": session.address,
-                "phone": session.phone,
-                "email": session.email,
-                "created_at": session.created_at,
-                "source": "db",
-                "obj": session,
-            }
-    except Exception as e:
-        print(f"[CHECKOUT] CheckoutSession DB load failed: {e}")
-
-    # Fallback: try cache
-    cache_key = f"checkout_{user.pk}"
-    data = cache.get(cache_key)
-    if data:
-        created_str = data.get("created_at", "")
-        try:
-            created_at = datetime.datetime.fromisoformat(created_str)
-            if timezone.is_naive(created_at):
-                created_at = timezone.make_aware(created_at)
-        except Exception:
-            created_at = timezone.now()
-        return {
-            "otp": data["otp"],
-            "address": data["address"],
-            "phone": data["phone"],
-            "email": data["email"],
-            "created_at": created_at,
-            "source": "cache",
-            "obj": None,
-        }
-
-    return None
-
-
-def _delete_checkout_session(user, session_info):
-    """Delete checkout session data from whatever store it came from."""
-    try:
-        if session_info.get("source") == "db" and session_info.get("obj"):
-            session_info["obj"].delete()
-        else:
-            cache_key = f"checkout_{user.pk}"
-            cache.delete(cache_key)
-    except Exception as e:
-        print(f"[CHECKOUT] Session delete failed: {e}")
-
-
-# ---------------------------------------------------------------------------
-# Checkout Initiate  – generates OTP
+# Checkout Initiate  – generates OTP, returns a signed token (NO DB/cache)
 # ---------------------------------------------------------------------------
 class CheckoutInitiateAPIView(views.APIView):
     permission_classes = [IsAuthenticated]
@@ -157,11 +75,20 @@ class CheckoutInitiateAPIView(views.APIView):
             # Generate OTP
             otp = str(random.randint(100000, 999999))
 
-            # Persist session (DB → cache fallback)
-            store = _save_checkout_session(request.user, otp, address, phone, email)
-            print(f"[CHECKOUT] OTP stored via {store} for {request.user.username}: {otp}")
+            # Create a signed token containing OTP + delivery details
+            # This is cryptographically signed using Django's SECRET_KEY
+            # so it cannot be tampered with. Expires in 5 minutes.
+            token_data = {
+                "otp": otp,
+                "address": address,
+                "phone": phone,
+                "email": email,
+                "user_id": request.user.pk,
+            }
+            checkout_token = signing.dumps(token_data, salt="checkout-otp")
+            print(f"[CHECKOUT] OTP generated for {request.user.username}: {otp}")
 
-            # Try to send OTP via Email (non-blocking)
+            # Try to send OTP via Email (non-blocking, fail_silently)
             try:
                 from django.core.mail import send_mail
                 from django.conf import settings
@@ -172,26 +99,26 @@ class CheckoutInitiateAPIView(views.APIView):
                     recipient_list=[email],
                     fail_silently=True,
                 )
-                print(f"[CHECKOUT] OTP email sent to {email}")
             except Exception as e:
-                print(f"[CHECKOUT] Email send error (non-fatal): {e}")
+                print(f"[CHECKOUT] Email error (non-fatal): {e}")
 
             return Response({
                 "message": "OTP generated successfully",
-                "otp": otp,  # Returned for easy testing from Flutter app
+                "otp": otp,
+                "checkout_token": checkout_token,
             })
 
         except Exception as e:
             tb = traceback.format_exc()
             print(f"[CHECKOUT INITIATE ERROR]\n{tb}")
             return Response(
-                {"error": f"Server error during checkout initiation: {str(e)}"},
+                {"error": f"Checkout error: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
 
 # ---------------------------------------------------------------------------
-# Checkout Complete  – verifies OTP and places orders
+# Checkout Complete  – verifies OTP from signed token and places orders
 # ---------------------------------------------------------------------------
 class CheckoutAPIView(views.APIView):
     permission_classes = [IsAuthenticated]
@@ -205,23 +132,33 @@ class CheckoutAPIView(views.APIView):
             if not cart_items.exists():
                 return Response({"error": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Verify OTP
             otp_input = request.data.get("otp")
-            session_info = _load_checkout_session(request.user)
+            checkout_token = request.data.get("checkout_token", "")
 
-            if not session_info or session_info["otp"] != otp_input:
-                return Response({"error": "Invalid or expired OTP"}, status=status.HTTP_400_BAD_REQUEST)
+            if not otp_input:
+                return Response({"error": "OTP is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Check expiration (5 minutes)
-            if timezone.now() - session_info["created_at"] > datetime.timedelta(minutes=5):
-                _delete_checkout_session(request.user, session_info)
-                return Response({"error": "Invalid or expired OTP"}, status=status.HTTP_400_BAD_REQUEST)
+            # Verify the signed token (max_age=300 = 5 minutes)
+            try:
+                token_data = signing.loads(checkout_token, salt="checkout-otp", max_age=300)
+            except signing.BadSignature:
+                return Response({"error": "Invalid or expired checkout session"}, status=status.HTTP_400_BAD_REQUEST)
+            except signing.SignatureExpired:
+                return Response({"error": "Checkout session expired. Please try again."}, status=status.HTTP_400_BAD_REQUEST)
 
-            address = session_info["address"]
-            phone = session_info["phone"]
-            email = session_info["email"]
+            # Verify OTP matches
+            if token_data.get("otp") != otp_input:
+                return Response({"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Save the checkout email to the user so the delivery OTP can reach them
+            # Verify user matches
+            if token_data.get("user_id") != request.user.pk:
+                return Response({"error": "Invalid checkout session"}, status=status.HTTP_400_BAD_REQUEST)
+
+            address = token_data["address"]
+            phone = token_data["phone"]
+            email = token_data["email"]
+
+            # Save the checkout email to the user
             if email and request.user.email != email:
                 request.user.email = email
                 request.user.save()
@@ -278,7 +215,6 @@ class CheckoutAPIView(views.APIView):
                 orders.append(buyer_order)
 
             cart_items.delete()
-            _delete_checkout_session(request.user, session_info)
 
             return Response({
                 "message": f"Order placed successfully and assigned to {agent_name}.",
@@ -290,7 +226,7 @@ class CheckoutAPIView(views.APIView):
             tb = traceback.format_exc()
             print(f"[CHECKOUT COMPLETE ERROR]\n{tb}")
             return Response(
-                {"error": f"Server error during checkout: {str(e)}"},
+                {"error": f"Checkout error: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 

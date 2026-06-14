@@ -103,19 +103,31 @@ class BuyerService {
   }
 
 
-  static Future<Map<String, dynamic>> checkout(String otp) async {
-    final response = await http.post(
-      Uri.parse(ApiConfig.checkout),
-      headers: await _getHeaders(),
-      body: jsonEncode({'otp': otp}),
-    );
-    if (response.statusCode == 200) {
-      return {'success': true, 'data': jsonDecode(response.body)};
+  static Future<Map<String, dynamic>> checkout(String otp, String checkoutToken) async {
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConfig.checkout),
+        headers: await _getHeaders(),
+        body: jsonEncode({'otp': otp, 'checkout_token': checkoutToken}),
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': jsonDecode(response.body)};
+      }
+      String errorMsg = 'Checkout failed';
+      try {
+        final decoded = jsonDecode(response.body);
+        if (decoded is Map) {
+          errorMsg = decoded['error'] ?? decoded['detail'] ?? errorMsg;
+        }
+      } catch (_) {
+        if (response.statusCode >= 500) {
+          errorMsg = 'Server error (${response.statusCode}). Please try again.';
+        }
+      }
+      return {'success': false, 'error': errorMsg};
+    } catch (e) {
+      return {'success': false, 'error': 'Network error: $e'};
     }
-    final err = response.statusCode == 400
-        ? jsonDecode(response.body)['error'] ?? 'Checkout failed'
-        : 'Server error';
-    return {'success': false, 'error': err};
   }
 
   // Order History

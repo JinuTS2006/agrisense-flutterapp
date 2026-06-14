@@ -113,9 +113,10 @@ class _CartScreenState extends State<CartScreen> {
       return;
     }
     
-    // Simulate showing the OTP
+    // Get the OTP and checkout token from the response
     final testOtp = initResult['data']['otp'];
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('TEST OTP: $testOtp')));
+    final checkoutToken = initResult['data']['checkout_token'] ?? '';
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('OTP sent to your email! (TEST: $testOtp)')));
 
     final otpController = TextEditingController();
     final otpSubmitted = await showDialog<bool>(
@@ -151,7 +152,7 @@ class _CartScreenState extends State<CartScreen> {
     if (otpSubmitted != true) return;
 
     setState(() => _isLoading = true);
-    final result = await BuyerService.checkout(otpController.text);
+    final result = await BuyerService.checkout(otpController.text, checkoutToken);
     if (!mounted) return;
     if (result['success']) {
       final data = result['data'];
