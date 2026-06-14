@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/buyer_service.dart';
+import '../../config/api_config.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -191,6 +192,11 @@ class _CartScreenState extends State<CartScreen> {
                         itemBuilder: (context, index) {
                           final item = _cartItems[index];
                           final product = item['product_details'];
+                          final imageUrl = product != null && product['image'] != null
+                              ? (product['image'].toString().startsWith('http')
+                                  ? product['image'].toString()
+                                  : '${ApiConfig.baseUrl}${product['image']}')
+                              : '';
                           return Container(
                             margin: const EdgeInsets.only(bottom: 16),
                             decoration: BoxDecoration(
@@ -199,6 +205,28 @@ class _CartScreenState extends State<CartScreen> {
                               border: Border.all(color: Colors.white.withOpacity(0.1)),
                             ),
                             child: ListTile(
+                              leading: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: imageUrl.isNotEmpty
+                                    ? Image.network(
+                                        imageUrl,
+                                        width: 50,
+                                        height: 50,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) => Container(
+                                          width: 50,
+                                          height: 50,
+                                          color: Colors.white.withOpacity(0.1),
+                                          child: const Icon(Icons.image_not_supported, color: Colors.white38),
+                                        ),
+                                      )
+                                    : Container(
+                                        width: 50,
+                                        height: 50,
+                                        color: Colors.white.withOpacity(0.1),
+                                        child: Icon(Icons.eco, color: primaryGreen),
+                                      ),
+                              ),
                               title: Text(product['name'], style: const TextStyle(color: Colors.white)),
                               subtitle: Text('Qty: ${item['quantity']} | \$${product['price']}', style: const TextStyle(color: Colors.white70)),
                               trailing: IconButton(

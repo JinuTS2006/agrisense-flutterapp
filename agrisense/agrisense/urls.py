@@ -47,5 +47,12 @@ urlpatterns = [
     path('api/v1/delivery/', include('delivery.api_urls')),
     path('api/v1/admin/', include('admin_panel.api_urls')),
 ]
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+from django.views.static import serve
+from django.urls import re_path
+
+# Always serve media files (including on Render where DEBUG=False)
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+]
+
 

@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../services/buyer_service.dart';
+import '../../config/api_config.dart';
 
 class BrowseProductsScreen extends StatefulWidget {
   const BrowseProductsScreen({super.key});
@@ -29,6 +30,12 @@ class _BrowseProductsScreenState extends State<BrowseProductsScreen> {
       _products = products;
       _isLoading = false;
     });
+  }
+
+  String _getFullImageUrl(String? imageUrl) {
+    if (imageUrl == null || imageUrl.isEmpty) return '';
+    if (imageUrl.startsWith('http')) return imageUrl;
+    return '${ApiConfig.baseUrl}$imageUrl';
   }
 
   Future<void> _addToCart(int productId, int availableQuantity) async {
@@ -75,6 +82,8 @@ class _BrowseProductsScreenState extends State<BrowseProductsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Added to cart!')),
       );
+      // Refresh the product list to show updated quantities
+      _fetchProducts();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to add to cart.')),
@@ -101,6 +110,7 @@ class _BrowseProductsScreenState extends State<BrowseProductsScreen> {
                   itemCount: _products.length,
                   itemBuilder: (context, index) {
                     final product = _products[index];
+                    final imageUrl = _getFullImageUrl(product['image']?.toString());
                     return Container(
                       margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
@@ -110,6 +120,28 @@ class _BrowseProductsScreenState extends State<BrowseProductsScreen> {
                       ),
                       child: ListTile(
                         contentPadding: const EdgeInsets.all(16),
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: imageUrl.isNotEmpty
+                              ? Image.network(
+                                  imageUrl,
+                                  width: 60,
+                                  height: 60,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => Container(
+                                    width: 60,
+                                    height: 60,
+                                    color: Colors.white.withOpacity(0.1),
+                                    child: Icon(Icons.image_not_supported, color: Colors.white38),
+                                  ),
+                                )
+                              : Container(
+                                  width: 60,
+                                  height: 60,
+                                  color: Colors.white.withOpacity(0.1),
+                                  child: Icon(Icons.eco, color: primaryGreen),
+                                ),
+                        ),
                         title: Text(
                           product['name'],
                           style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
@@ -137,3 +169,4 @@ class _BrowseProductsScreenState extends State<BrowseProductsScreen> {
     );
   }
 }
+

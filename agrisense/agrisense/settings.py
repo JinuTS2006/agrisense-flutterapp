@@ -100,6 +100,14 @@ DATABASES = {
     )
 }
 
+# Cache backend — use database so OTP works across Gunicorn workers on Render
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'django_cache_table',
+    }
+}
+
 
 
 # Password validation
