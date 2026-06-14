@@ -9,11 +9,15 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -168,5 +172,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'jinusreejayan@gmail.com'  # Replace with your Gmail address
-EMAIL_HOST_PASSWORD = 'REDACTED_APP_PASSWORD' # Replace with your 16-character App Password
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')  # Loaded from .env
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '') # Loaded from .env
+
+# Gemini AI API Key for the multi-language chatbot
+# Get your free API key from: https://aistudio.google.com/app/apikey
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')  # Loaded from .env

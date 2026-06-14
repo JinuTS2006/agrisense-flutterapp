@@ -42,4 +42,7 @@ class ApiConfig {
   // Admin endpoints
   static String get adminDashboard => '$apiPath/admin/dashboard/';
   static String get adminUsers => '$apiPath/admin/users/';
+
+  // Chatbot endpoint
+  static String get chatbot => '$apiPath/accounts/chatbot/';
 }

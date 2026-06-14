@@ -112,6 +112,12 @@ class CheckoutAPIView(views.APIView):
 
         address = session_data.get("address")
         phone = session_data.get("phone")
+        email = session_data.get("email")
+
+        # Save the checkout email to the user so the delivery OTP can reach them
+        if email and request.user.email != email:
+            request.user.email = email
+            request.user.save()
 
         # Pick first available delivery agent (same as website)
         agent_profile = DeliveryAgentProfile.objects.first()

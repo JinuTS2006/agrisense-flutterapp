@@ -2,9 +2,95 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import 'my_products_screen.dart';
+import 'farmer_orders_screen.dart';
+import 'farmer_profile_screen.dart';
+import '../chat/chatbot_screen.dart';
 
-class FarmerHomeScreen extends StatelessWidget {
+class FarmerHomeScreen extends StatefulWidget {
   const FarmerHomeScreen({super.key});
+
+  @override
+  State<FarmerHomeScreen> createState() => _FarmerHomeScreenState();
+}
+
+class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
+  int _currentIndex = 0;
+
+  final List<Widget> _screens = [
+    const _FarmerDashboardTab(),
+    const MyProductsScreen(),
+    const FarmerOrdersScreen(),
+    const FarmerProfileScreen(),
+  ];
+
+  final primaryGreen = const Color(0xFF4ADE80);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F172A),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: Colors.white.withOpacity(0.1))),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          backgroundColor: const Color(0xFF1E293B),
+          selectedItemColor: primaryGreen,
+          unselectedItemColor: Colors.white60,
+          type: BottomNavigationBarType.fixed,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard_outlined),
+              activeIcon: Icon(Icons.dashboard),
+              label: 'Dashboard',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.inventory_2_outlined),
+              activeIcon: Icon(Icons.inventory_2),
+              label: 'Products',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.receipt_long_outlined),
+              activeIcon: Icon(Icons.receipt_long),
+              label: 'Orders',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ChatbotScreen()),
+          );
+        },
+        backgroundColor: const Color(0xFF4ADE80),
+        foregroundColor: const Color(0xFF064E3B),
+        tooltip: 'AgriBot',
+        child: const Text('🌱', style: TextStyle(fontSize: 22)),
+      ),
+    );
+  }
+}
+
+class _FarmerDashboardTab extends StatelessWidget {
+  const _FarmerDashboardTab();
 
   @override
   Widget build(BuildContext context) {
@@ -12,8 +98,7 @@ class FarmerHomeScreen extends StatelessWidget {
     final primaryGreen = const Color(0xFF4ADE80);
 
     return Scaffold(
-      // A dark, rich background
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -34,7 +119,6 @@ class FarmerHomeScreen extends StatelessWidget {
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          // Background ambient glows
           Positioned(
             top: -100,
             left: -100,
@@ -85,7 +169,6 @@ class FarmerHomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 40),
 
-                  // Grid of Glass Cards
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
@@ -96,38 +179,11 @@ class FarmerHomeScreen extends StatelessWidget {
                     children: [
                       _buildGlassCard(
                         context: context,
-                        emoji: '👤',
-                        title: 'Profile',
-                        subtitle: 'Edit your personal and farm details.',
-                        buttonText: 'View Profile',
-                        onTap: () => Navigator.pushNamed(context, '/farmer_profile'),
-                        primaryGreen: primaryGreen,
-                      ),
-                      _buildGlassCard(
-                        context: context,
-                        emoji: '🍎',
-                        title: 'Products',
-                        subtitle: 'Update your harvest and stock levels.',
-                        buttonText: 'View products',
-                        onTap: () => Navigator.pushNamed(context, '/my_products'),
-                        primaryGreen: primaryGreen,
-                      ),
-                      _buildGlassCard(
-                        context: context,
                         emoji: '📊',
                         title: 'Profit Analysis',
                         subtitle: 'Check your expected profits and trends.',
                         buttonText: 'Open Analysis',
                         onTap: () => Navigator.pushNamed(context, '/profit_analysis'),
-                        primaryGreen: primaryGreen,
-                      ),
-                      _buildGlassCard(
-                        context: context,
-                        emoji: '📦',
-                        title: 'Orders',
-                        subtitle: 'View and manage incoming buyer requests.',
-                        buttonText: 'View Orders',
-                        onTap: () => Navigator.pushNamed(context, '/farmer_orders'),
                         primaryGreen: primaryGreen,
                       ),
                       _buildGlassCard(

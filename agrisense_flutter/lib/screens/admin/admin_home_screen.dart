@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/admin_service.dart';
+import 'admin_users_screen.dart';
+import '../chat/chatbot_screen.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -12,6 +14,76 @@ class AdminHomeScreen extends StatefulWidget {
 }
 
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
+  int _currentIndex = 0;
+
+  final List<Widget> _screens = [
+    const _AdminDashboardTab(),
+    const AdminUsersScreen(),
+  ];
+
+  final primaryGreen = const Color(0xFF4ADE80);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F172A),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: Colors.white.withOpacity(0.1))),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          backgroundColor: const Color(0xFF1E293B),
+          selectedItemColor: primaryGreen,
+          unselectedItemColor: Colors.white60,
+          type: BottomNavigationBarType.fixed,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard_outlined),
+              activeIcon: Icon(Icons.dashboard),
+              label: 'Dashboard',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people_outline),
+              activeIcon: Icon(Icons.people),
+              label: 'Users',
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ChatbotScreen()),
+          );
+        },
+        backgroundColor: const Color(0xFF4ADE80),
+        foregroundColor: const Color(0xFF064E3B),
+        tooltip: 'AgriBot',
+        child: const Text('🌱', style: TextStyle(fontSize: 22)),
+      ),
+    );
+  }
+}
+
+class _AdminDashboardTab extends StatefulWidget {
+  const _AdminDashboardTab();
+
+  @override
+  State<_AdminDashboardTab> createState() => _AdminDashboardTabState();
+}
+
+class _AdminDashboardTabState extends State<_AdminDashboardTab> {
   final primaryGreen = const Color(0xFF4ADE80);
   final bgDark = const Color(0xFF0F172A);
 
@@ -26,20 +98,22 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
   Future<void> _fetchStats() async {
     final result = await AdminService.getDashboardStats();
-    if (result['success']) {
-      setState(() {
-        _stats = result['data'];
-        _isLoading = false;
-      });
-    } else {
-      setState(() => _isLoading = false);
+    if (mounted) {
+      if (result['success']) {
+        setState(() {
+          _stats = result['data'];
+          _isLoading = false;
+        });
+      } else {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -96,18 +170,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                           ],
                         ),
                         const SizedBox(height: 40),
-                        
-                        ElevatedButton.icon(
-                          onPressed: () => Navigator.pushNamed(context, '/admin_users'),
-                          icon: const Icon(Icons.manage_accounts),
-                          label: const Text('Manage Users'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryGreen,
-                            foregroundColor: const Color(0xFF064E3B),
-                            minimumSize: const Size(double.infinity, 50),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                        ),
                       ],
                     ),
                   ),

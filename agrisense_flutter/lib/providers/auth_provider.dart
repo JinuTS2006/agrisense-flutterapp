@@ -45,6 +45,7 @@ class AuthProvider with ChangeNotifier {
     required String fullName,
     required String city,
     required String state,
+    String email = '',
     String phoneNumber = '',
   }) async {
     final result = await AuthService.register(
@@ -54,6 +55,7 @@ class AuthProvider with ChangeNotifier {
       fullName: fullName,
       city: city,
       state: state,
+      email: email,
       phoneNumber: phoneNumber,
     );
     if (result['success']) {

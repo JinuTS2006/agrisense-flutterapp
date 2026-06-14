@@ -11,6 +11,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _fullNameController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -35,6 +36,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final result = await authProvider.register(
       username: _usernameController.text,
       password: _passwordController.text,
+      email: _emailController.text,
       role: _selectedRole,
       fullName: _fullNameController.text,
       city: _cityController.text,
@@ -103,6 +105,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               _buildField(_fullNameController, 'Full Name', Icons.person),
               const SizedBox(height: 14),
               _buildField(_usernameController, 'Username', Icons.account_circle),
+              const SizedBox(height: 14),
+              _buildField(_emailController, 'Email', Icons.email),
               const SizedBox(height: 14),
               _buildField(_passwordController, 'Password', Icons.lock, obscure: true),
               const SizedBox(height: 14),

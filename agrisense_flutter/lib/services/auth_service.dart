@@ -33,6 +33,7 @@ class AuthService {
     required String fullName,
     required String city,
     required String state,
+    String email = '',
     String phoneNumber = '',
   }) async {
     final response = await http.post(
@@ -42,6 +43,7 @@ class AuthService {
         'username': username,
         'password': password,
         'full_name': fullName,
+        'email': email,
         'phone_number': phoneNumber,
         'city': city,
         'state': state,

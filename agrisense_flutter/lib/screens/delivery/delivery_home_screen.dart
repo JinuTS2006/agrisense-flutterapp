@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/delivery_service.dart';
+import 'delivery_assignments_screen.dart';
+import 'delivery_profile_screen.dart';
+import '../chat/chatbot_screen.dart';
 
 class DeliveryHomeScreen extends StatefulWidget {
   const DeliveryHomeScreen({super.key});
@@ -12,6 +15,82 @@ class DeliveryHomeScreen extends StatefulWidget {
 }
 
 class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
+  int _currentIndex = 0;
+
+  final List<Widget> _screens = [
+    const _DeliveryDashboardTab(),
+    const DeliveryAssignmentsScreen(),
+    const DeliveryProfileScreen(),
+  ];
+
+  final primaryGreen = const Color(0xFF4ADE80);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F172A),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: Colors.white.withOpacity(0.1))),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          backgroundColor: const Color(0xFF1E293B),
+          selectedItemColor: primaryGreen,
+          unselectedItemColor: Colors.white60,
+          type: BottomNavigationBarType.fixed,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard_outlined),
+              activeIcon: Icon(Icons.dashboard),
+              label: 'Dashboard',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.local_shipping_outlined),
+              activeIcon: Icon(Icons.local_shipping),
+              label: 'Assignments',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ChatbotScreen()),
+          );
+        },
+        backgroundColor: const Color(0xFF4ADE80),
+        foregroundColor: const Color(0xFF064E3B),
+        tooltip: 'AgriBot',
+        child: const Text('🌱', style: TextStyle(fontSize: 22)),
+      ),
+    );
+  }
+}
+
+class _DeliveryDashboardTab extends StatefulWidget {
+  const _DeliveryDashboardTab();
+
+  @override
+  State<_DeliveryDashboardTab> createState() => _DeliveryDashboardTabState();
+}
+
+class _DeliveryDashboardTabState extends State<_DeliveryDashboardTab> {
   final primaryGreen = const Color(0xFF4ADE80);
   final bgDark = const Color(0xFF0F172A);
 
@@ -39,13 +118,15 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
         pending++;
       }
     }
-    setState(() {
-      _assignments = assignments;
-      _total = assignments.length;
-      _pending = pending;
-      _delivered = delivered;
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _assignments = assignments;
+        _total = assignments.length;
+        _pending = pending;
+        _delivered = delivered;
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -53,7 +134,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
     final user = Provider.of<AuthProvider>(context).user;
 
     return Scaffold(
-      backgroundColor: bgDark,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -107,34 +188,6 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                           ],
                         ),
                         const SizedBox(height: 40),
-
-                        GridView.count(
-                          crossAxisCount: 2,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          mainAxisSpacing: 20,
-                          crossAxisSpacing: 20,
-                          childAspectRatio: 0.85,
-                          children: [
-                            _buildGlassCard(
-                              context: context,
-                              emoji: '📦',
-                              title: 'Assignments',
-                              subtitle: 'View and update task statuses.',
-                              buttonText: 'My Tasks',
-                              onTap: () => Navigator.pushNamed(context, '/delivery_assignments'),
-                              isPrimaryBtn: true,
-                            ),
-                            _buildGlassCard(
-                              context: context,
-                              emoji: '👤',
-                              title: 'Profile',
-                              subtitle: 'Edit your agent details.',
-                              buttonText: 'View Profile',
-                              onTap: () => Navigator.pushNamed(context, '/delivery_profile'),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   ),
@@ -158,57 +211,6 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
           const SizedBox(height: 8),
           Text(value, style: TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.bold)),
         ],
-      ),
-    );
-  }
-
-  Widget _buildGlassCard({
-    required BuildContext context,
-    required String emoji,
-    required String title,
-    required String subtitle,
-    required String buttonText,
-    required VoidCallback onTap,
-    bool isPrimaryBtn = false,
-  }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  Text(emoji, style: const TextStyle(fontSize: 40)),
-                  const SizedBox(height: 8),
-                  Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                  const SizedBox(height: 4),
-                  Text(subtitle, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12), textAlign: TextAlign.center, maxLines: 2),
-                ],
-              ),
-              ElevatedButton(
-                onPressed: onTap,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isPrimaryBtn ? primaryGreen : primaryGreen.withOpacity(0.1),
-                  foregroundColor: isPrimaryBtn ? const Color(0xFF064E3B) : primaryGreen,
-                  elevation: 0,
-                  side: BorderSide(color: primaryGreen),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  minimumSize: const Size(double.infinity, 36),
-                ),
-                child: Text(buttonText, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

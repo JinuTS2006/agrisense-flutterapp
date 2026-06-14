@@ -2,9 +2,102 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import 'browse_products_screen.dart';
+import 'cart_screen.dart';
+import 'buyer_orders_screen.dart';
+import 'buyer_profile_screen.dart';
+import '../chat/chatbot_screen.dart';
 
-class BuyerHomeScreen extends StatelessWidget {
+class BuyerHomeScreen extends StatefulWidget {
   const BuyerHomeScreen({super.key});
+
+  @override
+  State<BuyerHomeScreen> createState() => _BuyerHomeScreenState();
+}
+
+class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
+  int _currentIndex = 0;
+
+  final List<Widget> _screens = [
+    const _BuyerDashboardTab(),
+    const BrowseProductsScreen(),
+    const CartScreen(),
+    const BuyerOrdersScreen(),
+    const BuyerProfileScreen(),
+  ];
+
+  final primaryGreen = const Color(0xFF4ADE80);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F172A),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: Colors.white.withOpacity(0.1))),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          backgroundColor: const Color(0xFF1E293B),
+          selectedItemColor: primaryGreen,
+          unselectedItemColor: Colors.white60,
+          type: BottomNavigationBarType.fixed,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard_outlined),
+              activeIcon: Icon(Icons.dashboard),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_bag_outlined),
+              activeIcon: Icon(Icons.shopping_bag),
+              label: 'Shop',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_cart_outlined),
+              activeIcon: Icon(Icons.shopping_cart),
+              label: 'Cart',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.receipt_long_outlined),
+              activeIcon: Icon(Icons.receipt_long),
+              label: 'Orders',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ChatbotScreen()),
+          );
+        },
+        backgroundColor: const Color(0xFF4ADE80),
+        foregroundColor: const Color(0xFF064E3B),
+        tooltip: 'AgriBot',
+        child: const Text('🌱', style: TextStyle(fontSize: 22)),
+      ),
+    );
+  }
+}
+
+class _BuyerDashboardTab extends StatelessWidget {
+  const _BuyerDashboardTab();
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +105,7 @@ class BuyerHomeScreen extends StatelessWidget {
     final primaryGreen = const Color(0xFF4ADE80);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -97,7 +190,14 @@ class BuyerHomeScreen extends StatelessWidget {
                         title: 'Browse',
                         subtitle: 'Explore available products.',
                         buttonText: 'Shop Now',
-                        onTap: () => Navigator.pushNamed(context, '/browse_products'),
+                        onTap: () {
+                          final state = context.findAncestorStateOfType<_BuyerHomeScreenState>();
+                          if (state != null) {
+                            state.setState(() {
+                              state._currentIndex = 1;
+                            });
+                          }
+                        },
                         primaryGreen: primaryGreen,
                         isPrimaryBtn: true,
                       ),
@@ -107,7 +207,14 @@ class BuyerHomeScreen extends StatelessWidget {
                         title: 'My Cart',
                         subtitle: 'View items ready for checkout.',
                         buttonText: 'Open Cart',
-                        onTap: () => Navigator.pushNamed(context, '/cart'),
+                        onTap: () {
+                          final state = context.findAncestorStateOfType<_BuyerHomeScreenState>();
+                          if (state != null) {
+                            state.setState(() {
+                              state._currentIndex = 2;
+                            });
+                          }
+                        },
                         primaryGreen: primaryGreen,
                       ),
                       _buildGlassCard(
@@ -116,7 +223,14 @@ class BuyerHomeScreen extends StatelessWidget {
                         title: 'Orders',
                         subtitle: 'Track your purchase history.',
                         buttonText: 'View Orders',
-                        onTap: () => Navigator.pushNamed(context, '/buyer_orders'),
+                        onTap: () {
+                          final state = context.findAncestorStateOfType<_BuyerHomeScreenState>();
+                          if (state != null) {
+                            state.setState(() {
+                              state._currentIndex = 3;
+                            });
+                          }
+                        },
                         primaryGreen: primaryGreen,
                       ),
                       _buildGlassCard(
@@ -125,7 +239,14 @@ class BuyerHomeScreen extends StatelessWidget {
                         title: 'Profile',
                         subtitle: 'Manage your buyer account.',
                         buttonText: 'View Profile',
-                        onTap: () => Navigator.pushNamed(context, '/buyer_profile'),
+                        onTap: () {
+                          final state = context.findAncestorStateOfType<_BuyerHomeScreenState>();
+                          if (state != null) {
+                            state.setState(() {
+                              state._currentIndex = 4;
+                            });
+                          }
+                        },
                         primaryGreen: primaryGreen,
                       ),
                     ],
