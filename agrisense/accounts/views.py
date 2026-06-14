@@ -44,6 +44,46 @@ from delivery.models import DeliveryAgentProfile
 def home(request):
     return render(request, "accounts/home.html")
 
+def diagnose_server(request):
+    import subprocess, os, sys
+    from django.http import HttpResponse
+    
+    output = []
+    
+    # 1. Python version
+    output.append(f"Python Version: {sys.version}")
+    
+    # 2. Check api_views.py
+    try:
+        import hashlib
+        # Try both paths just in case
+        for p in ["agrisense/buyer/api_views.py", "buyer/api_views.py"]:
+            if os.path.exists(p):
+                with open(p, "rb") as f:
+                    h = hashlib.md5(f.read()).hexdigest()
+                output.append(f"api_views.py MD5 ({p}): {h}")
+                with open(p, "r", encoding="utf-8") as f:
+                    content = f.read()
+                output.append(f"Has signing: {'signing' in content}")
+                output.append(f"Has CheckoutSession: {'CheckoutSession' in content}")
+                break
+    except Exception as e:
+        output.append(f"Error reading api_views.py: {e}")
+
+        
+    # 3. Run showmigrations
+    try:
+        from django.core.management import call_command
+        from io import StringIO
+        out = StringIO()
+        call_command("showmigrations", stdout=out)
+        output.append(f"Migrations:\n{out.getvalue()}")
+    except Exception as e:
+        output.append(f"Showmigrations failed: {e}")
+        
+    return HttpResponse("\n\n".join(output), content_type="text/plain")
+
+
 def register_role(request, role):
     if role not in ["farmer", "buyer", "delivery"]:
         return redirect("accounts:home")  # fallback
