@@ -83,8 +83,16 @@ class BuyerService {
     if (response.statusCode == 200) {
       return {'success': true, 'data': jsonDecode(response.body)};
     }
-    return {'success': false, 'error': 'Failed to initiate checkout'};
+    String errorMsg = 'Failed to initiate checkout';
+    try {
+      final decoded = jsonDecode(response.body);
+      if (decoded is Map) {
+        errorMsg = decoded['error'] ?? decoded['detail'] ?? errorMsg;
+      }
+    } catch (_) {}
+    return {'success': false, 'error': errorMsg};
   }
+
 
   static Future<Map<String, dynamic>> checkout(String otp) async {
     final response = await http.post(

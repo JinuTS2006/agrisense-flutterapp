@@ -17,7 +17,8 @@ from ml_module.weather import get_weather_for_city
 from farmer.models import FarmerProfile
 from ml_module.crop_recommendation import recommend_top_crops
 # Load historical weather dataset once
-weather_df = pd.read_csv("ml_module/data/state_weather_data_1997_2020.csv")
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+weather_df = pd.read_csv(os.path.join(base_dir, "ml_module", "data", "state_weather_data_1997_2020.csv"))
 
 #@login_required
 # def farmer_dashboard(request):
@@ -225,7 +226,8 @@ from django.contrib import messages
 def profit_analysis_view(request):
     profit_result = None
 
-    price_df = pd.read_csv("ml_module/data/crop_price_state.csv")
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    price_df = pd.read_csv(os.path.join(base_dir, "ml_module", "data", "crop_price_state.csv"))
 
     states = sorted(price_df["state"].unique())
     crop_list = sorted(price_df["crop"].unique())

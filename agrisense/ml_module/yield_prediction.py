@@ -20,9 +20,10 @@ def train_yield_model():
     # ----------------------
     # Load datasets
     # ----------------------
-    yield_df = pd.read_csv("ml_module/data/crop_yield.csv")
-    soil_df = pd.read_csv("ml_module/data/state_soil_data.csv")
-    weather_df = pd.read_csv("ml_module/data/state_weather_data_1997_2020.csv")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    yield_df = pd.read_csv(os.path.join(base_dir, "data", "crop_yield.csv"))
+    soil_df = pd.read_csv(os.path.join(base_dir, "data", "state_soil_data.csv"))
+    weather_df = pd.read_csv(os.path.join(base_dir, "data", "state_weather_data_1997_2020.csv"))
 
     # ----------------------
     # Merge datasets

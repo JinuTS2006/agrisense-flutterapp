@@ -192,7 +192,10 @@ class _CartScreenState extends State<CartScreen> {
                         itemBuilder: (context, index) {
                           final item = _cartItems[index];
                           final product = item['product_details'];
-                          final imageUrl = product != null && product['image'] != null
+                          if (product == null) {
+                            return const SizedBox.shrink();
+                          }
+                          final imageUrl = product['image'] != null
                               ? (product['image'].toString().startsWith('http')
                                   ? product['image'].toString()
                                   : '${ApiConfig.baseUrl}${product['image']}')

@@ -21,6 +21,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
   XFile? _imageFile;
   final _picker = ImagePicker();
 
+  final primaryGreen = const Color(0xFF4ADE80);
+  final bgDark = const Color(0xFF0F172A);
+
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -55,31 +58,43 @@ class _AddProductScreenState extends State<AddProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add New Product')),
+      backgroundColor: bgDark,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text('Add New Product', style: TextStyle(color: primaryGreen)),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildTextField(_nameController, 'Product Name *'),
+            _buildTextField(_nameController, 'Product Name *', Icons.eco),
             const SizedBox(height: 16),
-            _buildTextField(_descController, 'Description'),
+            _buildTextField(_descController, 'Description', Icons.description),
             const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(child: _buildTextField(_priceController, 'Price (₹) *', TextInputType.number)),
+                Expanded(child: _buildTextField(_priceController, 'Price (₹) *', Icons.currency_rupee, TextInputType.number)),
                 const SizedBox(width: 16),
-                Expanded(child: _buildTextField(_qtyController, 'Quantity *', TextInputType.number)),
+                Expanded(child: _buildTextField(_qtyController, 'Quantity *', Icons.inventory, TextInputType.number)),
               ],
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               value: _selectedUnit,
+              dropdownColor: const Color(0xFF1E293B),
+              style: const TextStyle(color: Colors.white, fontSize: 16),
               decoration: InputDecoration(
                 labelText: 'Unit',
+                labelStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+                prefixIcon: Icon(Icons.straighten, color: primaryGreen.withOpacity(0.7)),
                 filled: true,
-                fillColor: Colors.grey.shade100,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                fillColor: Colors.white.withOpacity(0.08),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.15))),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.15))),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: primaryGreen)),
               ),
               items: const [
                 DropdownMenuItem(value: 'kg', child: Text('Kilogram (kg)')),
@@ -94,9 +109,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
               child: Container(
                 height: 150,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: Colors.white.withOpacity(0.05),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade300),
+                  border: Border.all(color: Colors.white.withOpacity(0.15)),
                 ),
                 child: _imageFile != null
                     ? ClipRRect(
@@ -105,12 +120,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           ? Image.network(_imageFile!.path, fit: BoxFit.cover, width: double.infinity)
                           : Image.file(File(_imageFile!.path), fit: BoxFit.cover, width: double.infinity),
                       )
-                    : const Column(
+                    : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.add_a_photo, size: 40, color: Colors.grey),
-                          SizedBox(height: 8),
-                          Text('Add Product Picture (Optional)', style: TextStyle(color: Colors.grey)),
+                          Icon(Icons.add_a_photo, size: 40, color: primaryGreen.withOpacity(0.5)),
+                          const SizedBox(height: 8),
+                          Text('Add Product Picture (Optional)', style: TextStyle(color: Colors.white.withOpacity(0.5))),
                         ],
                       ),
               ),
@@ -118,9 +133,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
             const SizedBox(height: 32),
             ElevatedButton(
               onPressed: _isLoading ? null : _submit,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryGreen,
+                foregroundColor: const Color(0xFF064E3B),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
               child: _isLoading 
-                ? const CircularProgressIndicator(color: Colors.white) 
-                : const Text('Save Product', style: TextStyle(fontSize: 16)),
+                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF064E3B))) 
+                : const Text('Save Product', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -128,15 +149,20 @@ class _AddProductScreenState extends State<AddProductScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, [TextInputType type = TextInputType.text]) {
+  Widget _buildTextField(TextEditingController controller, String label, IconData icon, [TextInputType type = TextInputType.text]) {
     return TextField(
       controller: controller,
       keyboardType: type,
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+        prefixIcon: Icon(icon, color: primaryGreen.withOpacity(0.7)),
         filled: true,
-        fillColor: Colors.grey.shade100,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+        fillColor: Colors.white.withOpacity(0.08),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.15))),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.15))),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: primaryGreen)),
       ),
     );
   }

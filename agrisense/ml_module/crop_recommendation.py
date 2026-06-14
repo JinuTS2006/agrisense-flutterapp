@@ -11,7 +11,8 @@ MODEL_FILE = os.path.join(os.path.dirname(__file__), "crop_model.pkl")
 
 def train_crop_model():
     # Load dataset
-    df = pd.read_csv("ml_module/data/crop_data.csv")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    df = pd.read_csv(os.path.join(base_dir, "data", "crop_data.csv"))
 
     # Features and target
     X = df[['N', 'P', 'K', 'temperature', 'humidity','ph', 'rainfall']]
@@ -82,7 +83,9 @@ def recommend_top_crops(input_features, top_n=3):
 
 # Suppose your dataset has a column 'label' for crops
 import pandas as pd
-CROP_DATA_PATH = "ml_module/data/crop_data.csv"
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CROP_DATA_PATH = os.path.join(BASE_DIR, "data", "crop_data.csv")
 
 crop_df = pd.read_csv(CROP_DATA_PATH)
 ALL_CROPS = crop_df['label'].unique().tolist()  # list of all crops

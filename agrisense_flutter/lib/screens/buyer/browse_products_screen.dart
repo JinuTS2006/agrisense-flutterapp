@@ -43,19 +43,25 @@ class _BrowseProductsScreenState extends State<BrowseProductsScreen> {
     final quantitySubmitted = await showDialog<int>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: bgDark,
+        backgroundColor: const Color(0xFF1E293B),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Enter Quantity', style: TextStyle(color: Colors.white)),
         content: TextField(
           controller: qtyController,
           keyboardType: TextInputType.number,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
+          style: const TextStyle(color: Colors.white, fontSize: 20),
+          decoration: InputDecoration(
             labelText: 'Quantity',
-            labelStyle: TextStyle(color: Colors.white70),
+            labelStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+            filled: true,
+            fillColor: Colors.white.withOpacity(0.08),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.15))),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.15))),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: primaryGreen)),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, null), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, null), child: const Text('Cancel', style: TextStyle(color: Colors.white70))),
           ElevatedButton(
             onPressed: () {
               final val = int.tryParse(qtyController.text);

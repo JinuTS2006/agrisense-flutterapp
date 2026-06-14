@@ -6,6 +6,7 @@ from .serializers import ProductSerializer, FarmerProfileSerializer, OrderSerial
 from rest_framework.parsers import MultiPartParser, FormParser
 import requests
 import pandas as pd
+import os
 from ml_module.crop_recommendation import recommend_top_crops
 from ml_module.yield_prediction import predict_yield, MODEL_FILE, pickle
 
@@ -136,7 +137,8 @@ class ProfitAnalysisAPIView(views.APIView):
 
     def get(self, request):
         try:
-            price_df = pd.read_csv("ml_module/data/crop_price_state.csv")
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            price_df = pd.read_csv(os.path.join(base_dir, "ml_module", "data", "crop_price_state.csv"))
             return Response({
                 "states": price_df["state"].unique().tolist(),
                 "crops": price_df["crop"].str.lower().unique().tolist()
@@ -151,7 +153,8 @@ class ProfitAnalysisAPIView(views.APIView):
         predicted_yield = float(request.data.get("yield", 0))
 
         try:
-            price_df = pd.read_csv("ml_module/data/crop_price_state.csv")
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            price_df = pd.read_csv(os.path.join(base_dir, "ml_module", "data", "crop_price_state.csv"))
             price_df["crop"] = price_df["crop"].str.lower()
             row = price_df[(price_df["state"] == state) & (price_df["crop"] == crop)]
             

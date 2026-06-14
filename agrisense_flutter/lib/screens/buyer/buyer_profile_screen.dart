@@ -106,7 +106,9 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
         labelStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
         filled: true,
         fillColor: Colors.white.withOpacity(0.08),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.15))),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withOpacity(0.15))),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: primaryGreen)),
       ),
     );
   }
