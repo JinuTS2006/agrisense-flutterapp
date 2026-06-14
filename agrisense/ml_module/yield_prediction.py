@@ -4,6 +4,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestRegressor
 import pickle
 import os
+import zipfile
 
 # Path to save/load the trained model
 MODEL_FILE = os.path.join(os.path.dirname(__file__), "yield_model.pkl")
@@ -99,7 +100,6 @@ def predict_yield(crop_name, input_data):
     """
     try:
         if not os.path.exists(MODEL_FILE):
-            import zipfile
             zip_path = os.path.join(os.path.dirname(__file__), "yield_model.zip")
             if os.path.exists(zip_path):
                 with zipfile.ZipFile(zip_path, 'r') as zip_ref:
@@ -108,7 +108,6 @@ def predict_yield(crop_name, input_data):
         with open(MODEL_FILE, "rb") as f:
             model, le = pickle.load(f)
     except FileNotFoundError:
-        import os
         dir_contents = os.listdir(os.path.dirname(__file__))
         raise Exception(f"Model file not found at {MODEL_FILE}. Contents of directory: {dir_contents}")
 
