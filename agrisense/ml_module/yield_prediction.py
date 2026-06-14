@@ -98,6 +98,13 @@ def predict_yield(crop_name, input_data):
     input_data: dict with keys: N,P,K,pH,avg_temp_c,avg_humidity_percent,total_rainfall_mm
     """
     try:
+        if not os.path.exists(MODEL_FILE):
+            import zipfile
+            zip_path = os.path.join(os.path.dirname(__file__), "yield_model.zip")
+            if os.path.exists(zip_path):
+                with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                    zip_ref.extractall(os.path.dirname(__file__))
+
         with open(MODEL_FILE, "rb") as f:
             model, le = pickle.load(f)
     except FileNotFoundError:
