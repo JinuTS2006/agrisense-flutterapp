@@ -135,10 +135,7 @@ class CheckoutInitiateAPIView(views.APIView):
         except Exception as e:
             tb = traceback.format_exc()
             print(f"[CHECKOUT INITIATE ERROR]\n{tb}")
-            return Response(
-                {"error": f"Checkout error: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+            raise e
 
 
 # ---------------------------------------------------------------------------
