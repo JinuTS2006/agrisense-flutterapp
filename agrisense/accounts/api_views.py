@@ -165,12 +165,17 @@ class DiagnosticLogAPIView(views.APIView):
     permission_classes = []
     def get(self, request):
         import os
+        from django.core.mail import send_mail
+        from django.conf import settings
         try:
-            log_path = "/tmp/test_write.txt"
-            with open(log_path, "w", encoding="utf-8") as f:
-                f.write("Hello from Render!")
-            with open(log_path, "r", encoding="utf-8") as f:
-                content = f.read()
-            return Response({"status": "success", "content": content})
+            send_mail(
+                subject="Render SMTP Diagnostic Test",
+                message="Testing connection...",
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[settings.EMAIL_HOST_USER],
+                fail_silently=False
+            )
+            return Response({"status": "success", "message": "Email sent successfully!"})
         except Exception as e:
-            return Response({"status": "error", "error": str(e)})
+            import traceback
+            return Response({"status": "error", "error": str(e), "traceback": traceback.format_exc()})
