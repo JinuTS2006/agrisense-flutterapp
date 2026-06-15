@@ -44,14 +44,11 @@ class _DeliveryAssignmentsScreenState extends State<DeliveryAssignmentsScreen> {
       return;
     }
 
-    // Show test OTP in snackbar for development
-    final testOtp = genResult['data']['otp'];
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('OTP sent to buyer\'s email (Test OTP: $testOtp)')),
-    );
+    // Get the OTP from API response
+    final otpFromServer = genResult['data']['otp']?.toString() ?? '';
 
-    // Step 2: Show OTP verification dialog
-    final otpController = TextEditingController();
+    // Step 2: Show OTP verification dialog with auto-filled OTP
+    final otpController = TextEditingController(text: otpFromServer);
     final otpSubmitted = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -62,8 +59,29 @@ class _DeliveryAssignmentsScreenState extends State<DeliveryAssignmentsScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: primaryGreen.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: primaryGreen.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.verified_user, color: primaryGreen, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'OTP has been auto-filled. Tap "Confirm Delivery" to complete.',
+                      style: TextStyle(color: primaryGreen, fontSize: 13),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
             const Text(
-              'An OTP has been sent to the buyer\'s email.\nAsk the buyer for the OTP to confirm delivery.',
+              'The buyer will also receive this OTP via email for verification.',
               style: TextStyle(color: Colors.white70),
             ),
             const SizedBox(height: 20),

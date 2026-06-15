@@ -110,27 +110,21 @@ class CheckoutInitiateAPIView(views.APIView):
                 raise e
 
             try:
-                import threading
                 from django.core.mail import send_mail
                 from django.conf import settings
-                def _send_otp_email():
-                    try:
-                        print(f"[CHECKOUT] Attempting to send email from {settings.EMAIL_HOST_USER} to {email}...")
-                        send_mail(
-                            subject="Agrisense - Your Checkout OTP",
-                            message=f"Your OTP for completing the purchase is: {otp}\nThis OTP is valid for 5 minutes.",
-                            from_email=settings.EMAIL_HOST_USER,
-                            recipient_list=[email],
-                            fail_silently=False,
-                        )
-                        print(f"[CHECKOUT] Email sent asynchronously to {email} successfully.")
-                    except Exception as e:
-                        import traceback
-                        print(f"[CHECKOUT] Email error in background thread: {e}")
-                        traceback.print_exc()
-                threading.Thread(target=_send_otp_email).start()
+                print(f"[CHECKOUT] Attempting to send email from {settings.EMAIL_HOST_USER} to {email}...")
+                send_mail(
+                    subject="Agrisense - Your Checkout OTP",
+                    message=f"Your OTP for completing the purchase is: {otp}\nThis OTP is valid for 5 minutes.",
+                    from_email=settings.EMAIL_HOST_USER,
+                    recipient_list=[email],
+                    fail_silently=False,
+                )
+                print(f"[CHECKOUT] Email sent to {email} successfully.")
             except Exception as e:
-                print(f"[CHECKOUT] Error initiating email thread: {e}")
+                import traceback
+                print(f"[CHECKOUT] Email error: {e}")
+                traceback.print_exc()
 
             return Response({
                 "message": "OTP generated successfully",

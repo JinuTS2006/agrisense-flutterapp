@@ -21,24 +21,24 @@ class GenerateDeliveryOTPAPIView(views.APIView):
         buyer = assignment.order.buyer
         buyer_email = buyer.email
         if buyer_email:
-            import threading
             from django.core.mail import send_mail
             from django.conf import settings as django_settings
-            def _send():
-                try:
-                    send_mail(
-                        subject='Agrisense - Delivery Verification OTP',
-                        message=f'Your delivery verification OTP is: {otp}\nPlease share this with the delivery agent to confirm receipt of your order.',
-                        from_email=getattr(django_settings, 'EMAIL_HOST_USER', 'noreply@agrisense.com'),
-                        recipient_list=[buyer_email],
-                        fail_silently=True,
-                    )
-                    print(f"--- SENT DELIVERY OTP TO {buyer_email}: {otp} ---")
-                except Exception as e:
-                    print(f"--- ERROR SENDING DELIVERY OTP EMAIL: {e} ---")
-            threading.Thread(target=_send).start()
+            try:
+                print(f"[DELIVERY OTP] Attempting to send email from {django_settings.EMAIL_HOST_USER} to {buyer_email}...")
+                send_mail(
+                    subject='Agrisense - Delivery Verification OTP',
+                    message=f'Your delivery verification OTP is: {otp}\nPlease share this with the delivery agent to confirm receipt of your order.',
+                    from_email=django_settings.EMAIL_HOST_USER,
+                    recipient_list=[buyer_email],
+                    fail_silently=False,
+                )
+                print(f"[DELIVERY OTP] Email sent to {buyer_email} successfully.")
+            except Exception as e:
+                import traceback
+                print(f"[DELIVERY OTP] Email error: {e}")
+                traceback.print_exc()
         else:
-            print(f"--- NO EMAIL FOR BUYER. DELIVERY OTP FOR ORDER #{assignment.order.id}: {otp} ---")
+            print(f"[DELIVERY OTP] No email for buyer. OTP for order #{assignment.order.id}: {otp}")
 
         print(f"--- DELIVERY OTP GENERATED: {otp} for assignment {pk} ---")
         return Response({

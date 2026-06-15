@@ -114,11 +114,10 @@ class _CartScreenState extends State<CartScreen> {
     }
     
     // Get the OTP and checkout token from the response
-    final testOtp = initResult['data']['otp'];
+    final otpFromServer = initResult['data']['otp'] ?? '';
     final checkoutToken = initResult['data']['checkout_token'] ?? '';
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('OTP sent to your email! (TEST: $testOtp)')));
 
-    final otpController = TextEditingController();
+    final otpController = TextEditingController(text: otpFromServer);
     final otpSubmitted = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -127,7 +126,28 @@ class _CartScreenState extends State<CartScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Cash on Delivery selected. Please enter the OTP sent to your email address to verify this order.', style: TextStyle(color: Colors.white70)),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: primaryGreen.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: primaryGreen.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.verified_user, color: primaryGreen, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Your OTP has been auto-filled below. Tap "Verify & Place Order" to confirm.',
+                      style: TextStyle(color: primaryGreen, fontSize: 13),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text('Cash on Delivery selected. Verify the OTP to confirm your order.', style: TextStyle(color: Colors.white70)),
             const SizedBox(height: 16),
             TextField(
               controller: otpController,
