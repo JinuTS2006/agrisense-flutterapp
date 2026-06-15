@@ -165,8 +165,7 @@ class DiagnosticLogAPIView(views.APIView):
     permission_classes = []
     def get(self, request):
         import os
-        from django.conf import settings
-        log_path = os.path.join(settings.BASE_DIR, "logs", "django_error_log.txt")
+        log_path = "/tmp/django_error_log.txt"
         if os.path.exists(log_path):
             with open(log_path, "r", encoding="utf-8") as f:
                 content = f.read()
