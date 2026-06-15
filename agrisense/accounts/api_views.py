@@ -159,3 +159,16 @@ Keep your responses concise, friendly, and practical. Use simple language that f
             "Malayalam": f"നമസ്കാരം! ഞാൻ AgriBot 🌱 ആണ്. കൃഷി, വിള ഉപദേശം, വിപണി ചോദ്യങ്ങൾ എന്നിവയ്ക്ക് ഞാൻ ഇവിടെ ഉണ്ട്. പൂർണ AI ഉത്തരങ്ങൾക്ക് settings.py-ൽ Gemini API key ചേർക്കുക.",
         }
         return responses.get(language, responses["English"])
+
+
+class DiagnosticLogAPIView(views.APIView):
+    permission_classes = []
+    def get(self, request):
+        import os
+        from django.conf import settings
+        log_path = os.path.join(settings.BASE_DIR, "logs", "django_error_log.txt")
+        if os.path.exists(log_path):
+            with open(log_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            return Response({"logs": content[-20000:]})
+        return Response({"logs": f"Log file not found at {log_path}"})
