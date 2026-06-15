@@ -165,9 +165,12 @@ class DiagnosticLogAPIView(views.APIView):
     permission_classes = []
     def get(self, request):
         import os
-        log_path = "/tmp/django_error_log.txt"
-        if os.path.exists(log_path):
+        try:
+            log_path = "/tmp/test_write.txt"
+            with open(log_path, "w", encoding="utf-8") as f:
+                f.write("Hello from Render!")
             with open(log_path, "r", encoding="utf-8") as f:
                 content = f.read()
-            return Response({"logs": content[-20000:]})
-        return Response({"logs": f"Log file not found at {log_path}"})
+            return Response({"status": "success", "content": content})
+        except Exception as e:
+            return Response({"status": "error", "error": str(e)})
