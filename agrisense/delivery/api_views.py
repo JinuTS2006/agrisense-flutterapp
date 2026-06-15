@@ -21,22 +21,25 @@ class GenerateDeliveryOTPAPIView(views.APIView):
         buyer = assignment.order.buyer
         buyer_email = buyer.email
         if buyer_email:
+            import threading
             from django.core.mail import send_mail
             from django.conf import settings as django_settings
-            try:
-                print(f"[DELIVERY OTP] Attempting to send email from {django_settings.EMAIL_HOST_USER} to {buyer_email}...")
-                send_mail(
-                    subject='Agrisense - Delivery Verification OTP',
-                    message=f'Your delivery verification OTP is: {otp}\nPlease share this with the delivery agent to confirm receipt of your order.',
-                    from_email=django_settings.EMAIL_HOST_USER,
-                    recipient_list=[buyer_email],
-                    fail_silently=False,
-                )
-                print(f"[DELIVERY OTP] Email sent to {buyer_email} successfully.")
-            except Exception as e:
-                import traceback
-                print(f"[DELIVERY OTP] Email error: {e}")
-                traceback.print_exc()
+            def _send():
+                try:
+                    print(f"[DELIVERY OTP] Attempting to send email from {django_settings.EMAIL_HOST_USER} to {buyer_email}...")
+                    send_mail(
+                        subject='Agrisense - Delivery Verification OTP',
+                        message=f'Your delivery verification OTP is: {otp}\nPlease share this with the delivery agent to confirm receipt of your order.',
+                        from_email=django_settings.EMAIL_HOST_USER,
+                        recipient_list=[buyer_email],
+                        fail_silently=False,
+                    )
+                    print(f"[DELIVERY OTP] Email sent asynchronously to {buyer_email} successfully.")
+                except Exception as e:
+                    import traceback
+                    print(f"[DELIVERY OTP] Email error in background thread: {e}")
+                    traceback.print_exc()
+            threading.Thread(target=_send).start()
         else:
             print(f"[DELIVERY OTP] No email for buyer. OTP for order #{assignment.order.id}: {otp}")
 

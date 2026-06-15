@@ -165,17 +165,9 @@ class DiagnosticLogAPIView(views.APIView):
     permission_classes = []
     def get(self, request):
         import os
-        from django.core.mail import send_mail
-        from django.conf import settings
-        try:
-            send_mail(
-                subject="Render SMTP Diagnostic Test",
-                message="Testing connection...",
-                from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[settings.EMAIL_HOST_USER],
-                fail_silently=False
-            )
-            return Response({"status": "success", "message": "Email sent successfully!"})
-        except Exception as e:
-            import traceback
-            return Response({"status": "error", "error": str(e), "traceback": traceback.format_exc()})
+        log_path = "/tmp/django_error_log.txt"
+        if os.path.exists(log_path):
+            with open(log_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            return Response({"logs": content[-20000:]})
+        return Response({"logs": f"Log file not found at {log_path}"})

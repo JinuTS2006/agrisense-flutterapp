@@ -178,11 +178,14 @@ SIMPLE_JWT = {
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+# Default to port 2525 on Render for Brevo to bypass SMTP port blocking
+default_port = 2525 if 'smtp-relay.brevo.com' in EMAIL_HOST else 587
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', default_port))
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('true', '1', 't')
 EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() in ('true', '1', 't')
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')  # Loaded from .env
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '') # Loaded from .env
+EMAIL_TIMEOUT = 10  # Prevent blocking connections from hanging the workers
 
 # Gemini AI API Key for the multi-language chatbot
 # Get your free API key from: https://aistudio.google.com/app/apikey
