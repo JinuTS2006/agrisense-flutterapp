@@ -83,6 +83,8 @@ def diagnose_server(request):
         
     # 4. Check for error logs
     try:
+        output.append(f"CWD: {os.getcwd()}")
+        output.append(f"CWD contents: {os.listdir('.')}")
         log_paths = ["django_error_log.txt", "agrisense/django_error_log.txt"]
         found = False
         for lp in log_paths:
