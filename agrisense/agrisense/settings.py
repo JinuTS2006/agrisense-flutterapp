@@ -175,14 +175,11 @@ SIMPLE_JWT = {
 }
 
 # Email Configuration
-# Defaulting to console backend for development so emails are printed to the console
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-# To send actual emails via Gmail, comment out the line above and uncomment the lines below:
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('true', '1', 't')
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() in ('true', '1', 't')
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')  # Loaded from .env
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '') # Loaded from .env
 
