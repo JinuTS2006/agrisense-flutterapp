@@ -237,3 +237,11 @@ class OrderHistoryAPIView(views.APIView):
     def get(self, request):
         orders = Order.objects.filter(buyer=request.user).order_by('-created_at')
         return Response(OrderSerializer(orders, many=True).data)
+
+
+class TestCheckoutInitiateAPIView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        return Response({"message": "test initiate works"})
+
