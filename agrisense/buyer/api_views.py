@@ -71,36 +71,63 @@ class CheckoutInitiateAPIView(views.APIView):
                     {"error": "Address, phone number, and email are required"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-
-            # Generate OTP
-            otp = str(random.randint(100000, 999999))
-
-            # Create a signed token containing OTP + delivery details
-            # This is cryptographically signed using Django's SECRET_KEY
-            # so it cannot be tampered with. Expires in 5 minutes.
-            token_data = {
-                "otp": otp,
-                "address": address,
-                "phone": phone,
-                "email": email,
-                "user_id": request.user.pk,
-            }
-            checkout_token = signing.dumps(token_data, salt="checkout-otp")
-            print(f"[CHECKOUT] OTP generated for {request.user.username}: {otp}")
-
-            # Try to send OTP via Email (non-blocking, fail_silently)
             try:
+                cart_items = Cart.objects.filter(buyer=request.user)
+                if not cart_items.exists():
+                    return Response({"error": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
+                print("[CHECKOUT] Cart retrieved successfully.")
+            except Exception as e:
+                print(f"[CHECKOUT] Error retrieving cart: {e}")
+                raise e
+
+            try:
+                address = request.data.get("address")
+                phone = request.data.get("phone")
+                email = request.data.get("email")
+                if not address or not phone or not email:
+                    return Response(
+                        {"error": "Address, phone number, and email are required"},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+                print("[CHECKOUT] Request validation successful.")
+            except Exception as e:
+                print(f"[CHECKOUT] Error during validation: {e}")
+                raise e
+
+            try:
+                otp = str(random.randint(100000, 999999))
+                token_data = {
+                    "otp": otp,
+                    "address": address,
+                    "phone": phone,
+                    "email": email,
+                    "user_id": request.user.pk,
+                }
+                checkout_token = signing.dumps(token_data, salt="checkout-otp")
+                print(f"[CHECKOUT] OTP and token generated for {request.user.username}.")
+            except Exception as e:
+                print(f"[CHECKOUT] Error during token generation: {e}")
+                raise e
+
+            try:
+                import threading
                 from django.core.mail import send_mail
                 from django.conf import settings
-                send_mail(
-                    subject="Agrisense - Your Checkout OTP",
-                    message=f"Your OTP for completing the purchase is: {otp}\nThis OTP is valid for 5 minutes.",
-                    from_email=getattr(settings, "EMAIL_HOST_USER", "noreply@agrisense.com"),
-                    recipient_list=[email],
-                    fail_silently=True,
-                )
+                def _send_otp_email():
+                    try:
+                        send_mail(
+                            subject="Agrisense - Your Checkout OTP",
+                            message=f"Your OTP for completing the purchase is: {otp}\nThis OTP is valid for 5 minutes.",
+                            from_email=getattr(settings, "EMAIL_HOST_USER", "noreply@agrisense.com"),
+                            recipient_list=[email],
+                            fail_silently=True,
+                        )
+                        print(f"[CHECKOUT] Email sent asynchronously to {email} successfully.")
+                    except Exception as e:
+                        print(f"[CHECKOUT] Email error in background thread: {e}")
+                threading.Thread(target=_send_otp_email).start()
             except Exception as e:
-                print(f"[CHECKOUT] Email error (non-fatal): {e}")
+                print(f"[CHECKOUT] Error initiating email thread: {e}")
 
             return Response({
                 "message": "OTP generated successfully",
@@ -163,9 +190,10 @@ class CheckoutAPIView(views.APIView):
                 request.user.email = email
                 request.user.save()
 
-            # Pick first available delivery agent
-            agent_profile = DeliveryAgentProfile.objects.first()
-            agent_name = agent_profile.full_name if agent_profile else "Unassigned"
+            # Robust random selection of delivery agent
+            agent_profiles = list(DeliveryAgentProfile.objects.all())
+            selected_agent = random.choice(agent_profiles) if agent_profiles else None
+            agent_name = selected_agent.full_name if selected_agent else "Unassigned"
 
             orders = []
             for item in cart_items:
@@ -206,10 +234,10 @@ class CheckoutAPIView(views.APIView):
                 )
 
                 # 3. Assign delivery agent if available
-                if agent_profile:
+                if selected_agent:
                     DeliveryAssignment.objects.create(
                         order=farmer_order,
-                        delivery_agent=agent_profile.user,
+                        delivery_agent=selected_agent.user,
                     )
 
                 orders.append(buyer_order)
