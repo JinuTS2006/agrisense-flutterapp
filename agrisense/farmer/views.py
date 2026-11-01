@@ -137,7 +137,7 @@ def crop_recommendation(request):
 
 # Function to fetch weather for a city
 def get_weather_for_city(city):
-    API_KEY = "YOUR_OPENWEATHER_API_KEY"  # Replace with your key
+    API_KEY = getattr(settings, 'OPENWEATHER_API_KEY', os.environ.get('OPENWEATHER_API_KEY', ''))
     try:
         url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
         res = requests.get(url).json()
