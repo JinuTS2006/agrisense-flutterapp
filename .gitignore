@@ -68,3 +68,7 @@ agrisense_flutter/build/
 .Trashes
 ehthumbs.db
 Thumbs.db
+checkout_response.html
+*.log
+debug_check.py
+django_error_log.txt

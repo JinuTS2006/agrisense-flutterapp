@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login
@@ -44,6 +45,7 @@ from delivery.models import DeliveryAgentProfile
 def home(request):
     return render(request, "accounts/home.html")
 
+@staff_member_required
 def diagnose_server(request):
     import subprocess, os, sys
     from django.http import HttpResponse

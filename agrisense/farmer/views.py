@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 import requests
 import pandas as pd
 import os
+from django.conf import settings
 from ml_module.crop_recommendation import recommend_top_crops
 from ml_module.yield_prediction import predict_yield, MODEL_FILE, pickle
 from farmer.models import FarmerProfile
@@ -76,7 +77,7 @@ def crop_recommendation(request):
 
     # Live weather
     try:
-        API_KEY = "REDACTED_API_KEY"
+        API_KEY = getattr(settings, 'OPENWEATHER_API_KEY', os.environ.get('OPENWEATHER_API_KEY', ''))
         url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
         res = requests.get(url, timeout=5).json()
 
@@ -179,7 +180,7 @@ def yield_prediction_view(request):
 
             # Fetch weather automatically
             city = profile.city
-            API_KEY = "REDACTED_API_KEY"
+            API_KEY = getattr(settings, 'OPENWEATHER_API_KEY', os.environ.get('OPENWEATHER_API_KEY', ''))
             weather = {"avg_temp_c": 25, "avg_humidity_percent": 50, "total_rainfall_mm": 0}
             try:
                 url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"

@@ -7,6 +7,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 import requests
 import pandas as pd
 import os
+from django.conf import settings
 from ml_module.crop_recommendation import recommend_top_crops
 from ml_module.yield_prediction import predict_yield, MODEL_FILE, pickle
 
@@ -73,7 +74,7 @@ class CropRecommendationAPIView(views.APIView):
         )
         weather = {"temperature": 25, "humidity": 50, "rainfall": 0}
         try:
-            API_KEY = "REDACTED_API_KEY"
+            API_KEY = getattr(settings, 'OPENWEATHER_API_KEY', os.environ.get('OPENWEATHER_API_KEY', ''))
             url = f"http://api.openweathermap.org/data/2.5/weather?q={profile.city}&appid={API_KEY}&units=metric"
             res = requests.get(url, timeout=5).json()
             weather["temperature"] = res["main"]["temp"]
@@ -107,7 +108,7 @@ class YieldPredictionAPIView(views.APIView):
         profile, _ = FarmerProfile.objects.get_or_create(user=request.user)
         weather = {"avg_temp_c": 25, "avg_humidity_percent": 50, "total_rainfall_mm": 0}
         try:
-            API_KEY = "REDACTED_API_KEY"
+            API_KEY = getattr(settings, 'OPENWEATHER_API_KEY', os.environ.get('OPENWEATHER_API_KEY', ''))
             url = f"http://api.openweathermap.org/data/2.5/weather?q={profile.city}&appid={API_KEY}&units=metric"
             res = requests.get(url, timeout=5).json()
             weather["avg_temp_c"] = res["main"]["temp"]

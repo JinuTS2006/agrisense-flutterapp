@@ -1,6 +1,6 @@
 from rest_framework import views, status
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.conf import settings as django_settings
@@ -162,7 +162,7 @@ Keep your responses concise, friendly, and practical. Use simple language that f
 
 
 class DiagnosticLogAPIView(views.APIView):
-    permission_classes = []
+    permission_classes = [IsAdminUser]
     def get(self, request):
         import os
         log_path = "/tmp/django_error_log.txt"

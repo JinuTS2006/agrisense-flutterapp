@@ -190,3 +190,6 @@ EMAIL_TIMEOUT = 10  # Prevent blocking connections from hanging the workers
 # Gemini AI API Key for the multi-language chatbot
 # Get your free API key from: https://aistudio.google.com/app/apikey
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')  # Loaded from .env
+
+# OpenWeatherMap API Key
+OPENWEATHER_API_KEY = os.environ.get('OPENWEATHER_API_KEY', '')  # Loaded from .env

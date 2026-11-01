@@ -21,3 +21,8 @@ db.sqlite3-journal
 
 # Ignore media/uploads (user-uploaded files)
 media/
+
+# Debug scripts & logs
+debug_check.py
+*.log
+django_error_log.txt
